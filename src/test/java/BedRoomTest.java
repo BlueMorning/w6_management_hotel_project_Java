@@ -19,6 +19,11 @@ public class BedRoomTest {
         assertEquals("Orange", bedRoom.getName());
     }
 
+    @Test
+    public void hasNightRate(){
+        assertEquals(50, bedRoom.getNightRate());
+    }
+
 
 
 }

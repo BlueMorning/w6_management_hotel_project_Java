@@ -3,14 +3,14 @@ package hotel;
 public class BedRoom extends Room {
 
 
-    private int rate;
+    private int nightRate;
 
-    public BedRoom(String name, int capacity, int rate) {
+    public BedRoom(String name, int capacity, int nightRate) {
         super(name, capacity);
-        this.rate = rate;
+        this.nightRate = nightRate;
     }
 
-    public int getRate(){
-        return this.rate;
+    public int getNightRate(){
+        return this.nightRate;
     }
 }
