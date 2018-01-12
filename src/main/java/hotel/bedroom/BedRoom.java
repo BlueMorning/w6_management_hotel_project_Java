@@ -1,6 +1,6 @@
 package hotel.bedroom;
 
-import hotel.Room;
+import hotel.room.Room;
 
 public class BedRoom extends Room {
 
