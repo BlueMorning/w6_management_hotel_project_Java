@@ -3,8 +3,8 @@ package hotel;
 public class Room {
 
 
-    private int capacity;
-    private String name;
+    protected int capacity;
+    protected String name;
 
     public Room(String name, int capacity){
         this.name     = name;
