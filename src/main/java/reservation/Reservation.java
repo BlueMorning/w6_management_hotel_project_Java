@@ -1,8 +1,10 @@
 package reservation;
 
+import guest.Guest;
 import hotel.room.Room;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Reservation {
@@ -14,7 +16,7 @@ public class Reservation {
     private int duration;
     private ReservationStatus status;
 
-    public Reservation(Room room, String startingDate, int duration) {
+    public Reservation(Room room, String startingDate, int duration, ArrayList<Guest> guests) {
 
         this.room               = room;
         this.startDateString    = startingDate;
@@ -49,7 +51,7 @@ public class Reservation {
     }
 
     public void calculateEndDate(){
-        this.endDate = this.startDate.plusDays(this.duration);
+        this.endDate = this.startDate.plusDays(this.duration-1);
     }
 
     public void setStartDate(String startDate){
@@ -59,5 +61,9 @@ public class Reservation {
 
     public void setDuration(){
         calculateEndDate();
+    }
+
+    public void endReservation(){
+        this.status = ReservationStatus.ENDED;
     }
 }

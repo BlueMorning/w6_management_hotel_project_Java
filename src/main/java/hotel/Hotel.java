@@ -1,9 +1,11 @@
 package hotel;
 
+import guest.Guest;
 import hotel.room.Room;
 import reservation.Reservation;
 import reservation.ReservationStatus;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Hotel {
@@ -113,10 +115,10 @@ public class Hotel {
         reservations.add(reservation);
     }
 
-    public Boolean checkReservationToAdd(Room room, String startDate, int duration){
+    public Boolean checkReservationToAdd(Room room, String startDate, int duration,  ArrayList<Guest> guests){
 
         Boolean reservationAdded = false;
-        Reservation reservationToAdd = new Reservation(room, startDate, duration);
+        Reservation reservationToAdd = new Reservation(room, startDate, duration, guests);
 
         if(isRoomAvailable(reservationToAdd)) {
             reservations.add(reservationToAdd);
@@ -124,6 +126,21 @@ public class Hotel {
         }
 
         return reservationAdded;
+    }
+
+    public void checkOutReservation(Reservation reservation){
+        reservation.endReservation();
+    }
+
+    public void checkOutAllEndedReservation(){
+
+        for(Reservation reservation: this.getOnGoingReservations())
+        {
+            if(reservation.getEndDate().isBefore(LocalDate.now()))
+            {
+                reservation.endReservation();
+            }
+        }
     }
 
 }

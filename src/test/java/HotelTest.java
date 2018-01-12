@@ -1,3 +1,4 @@
+import guest.Guest;
 import hotel.Hotel;
 import hotel.bedroom.BedRoom;
 import hotel.bedroom.BedRoomType;
@@ -19,11 +20,13 @@ public class HotelTest {
     ArrayList<Room> rooms;
     BedRoom bedRoom;
     ConferenceRoom confRoom;
+    DiningRoom diningRoom;
     ArrayList<Menu> menuList;
+    ArrayList<Guest> guests;
 
     @Before
     public void Before(){
-        rooms = new ArrayList<>();
+        rooms   = new ArrayList<>();
 
         bedRoom = new BedRoom("Orange", BedRoomType.DOUBLE, 50);
         rooms.add(bedRoom);
@@ -36,10 +39,13 @@ public class HotelTest {
         menuList.add(new Menu("Senses", 34.5));
         menuList.add(new Menu("Experience", 60.0));
 
-        rooms.add(new DiningRoom("The Gourmet", 100, menuList));
+        diningRoom = new DiningRoom("The Gourmet", 100, menuList);
+        rooms.add(diningRoom);
 
 
         hotel = new Hotel("Laucala Island", rooms);
+
+        guests = new ArrayList<>();
     }
 
     @Test
@@ -70,13 +76,13 @@ public class HotelTest {
 
     @Test
     public void isRoomAvailable_true(){
-        Reservation reservation1 = new Reservation(bedRoom, "2018-01-12", 10);
+        Reservation reservation1 = new Reservation(bedRoom, "2018-01-12", 10, guests);
         assertEquals(true, hotel.isRoomAvailable(reservation1));
 
-        Reservation reservation2 = new Reservation(bedRoom, "2018-01-10", 1);
+        Reservation reservation2 = new Reservation(bedRoom, "2018-01-10", 1, guests);
         assertEquals(true, hotel.isRoomAvailable(reservation2));
 
-        Reservation reservation3 = new Reservation(bedRoom, "2018-01-23", 3);
+        Reservation reservation3 = new Reservation(bedRoom, "2018-01-23", 3, guests);
         assertEquals(true, hotel.isRoomAvailable(reservation3));
     }
 
@@ -84,7 +90,7 @@ public class HotelTest {
     @Test
     public void canAddReservation(){
         assertEquals(0, hotel.getAllReservationsCount());
-        hotel.checkReservationToAdd(bedRoom, "2018-01-12", 10);
+        hotel.checkReservationToAdd(bedRoom, "2018-01-12", 10, guests);
         assertEquals(1, hotel.getOnGoingReservationsCount());
     }
 
@@ -93,19 +99,45 @@ public class HotelTest {
     public void isRoomAvailable_false(){
 
         assertEquals(0, hotel.getAllReservationsCount());
-        hotel.checkReservationToAdd(bedRoom, "2018-01-12", 10);
+        hotel.checkReservationToAdd(bedRoom, "2018-01-12", 10, guests);
         assertEquals(1, hotel.getOnGoingReservationsCount());
 
-        Reservation reservation1 = new Reservation(bedRoom, "2018-01-10", 3);
+        Reservation reservation1 = new Reservation(bedRoom, "2018-01-10", 3, guests);
         assertEquals(false, hotel.isRoomAvailable(reservation1));
 
-        Reservation reservation2 = new Reservation(bedRoom, "2018-01-13", 2);
+        Reservation reservation2 = new Reservation(bedRoom, "2018-01-13", 2, guests);
         assertEquals(false, hotel.isRoomAvailable(reservation2));
 
-        Reservation reservation3 = new Reservation(bedRoom, "2018-01-21", 7);
+        Reservation reservation3 = new Reservation(bedRoom, "2018-01-21", 7, guests);
         assertEquals(false, hotel.isRoomAvailable(reservation3));
     }
 
+    @Test
+    public void canCheckOutReservation(){
+
+        assertEquals(0, hotel.getAllReservationsCount());
+        hotel.checkReservationToAdd(bedRoom, "2018-01-02", 3, guests);
+        assertEquals(1, hotel.getOnGoingReservationsCount());
+
+        hotel.checkOutReservation(hotel.getOnGoingReservations().get(0));
+
+        assertEquals(0, hotel.getOnGoingReservationsCount());
+    }
+
+    @Test
+    public void canCheckOutAllReservations(){
+
+        assertEquals(0, hotel.getAllReservationsCount());
+        hotel.checkReservationToAdd(bedRoom,    "2018-01-02", 3, guests);
+        hotel.checkReservationToAdd(confRoom,   "2018-01-05", 5, guests);
+        hotel.checkReservationToAdd(diningRoom, "2018-01-10", 2, guests);
+
+        assertEquals(3, hotel.getOnGoingReservationsCount());
+
+        hotel.checkOutAllEndedReservation();
+
+        assertEquals(0, hotel.getOnGoingReservationsCount());
+    }
 
 
 
