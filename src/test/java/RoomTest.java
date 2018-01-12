@@ -13,8 +13,6 @@ public class RoomTest {
         room = new Room("Blue", 2);
     }
 
-
-
     @Test
     public void hasName(){
         assertEquals("Blue", room.getName());
