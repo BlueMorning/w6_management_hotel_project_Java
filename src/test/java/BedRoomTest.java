@@ -1,4 +1,5 @@
-import hotel.BedRoom;
+import hotel.bedroom.BedRoom;
+import hotel.bedroom.BedRoomType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,7 +11,7 @@ public class BedRoomTest {
 
     @Before
     public void Before(){
-        bedRoom = new BedRoom("Orange", 2, 50);
+        bedRoom = new BedRoom("Orange", BedRoomType.DOUBLE, 50);
     }
 
 
@@ -22,6 +23,16 @@ public class BedRoomTest {
     @Test
     public void hasNightRate(){
         assertEquals(50, bedRoom.getNightRate());
+    }
+
+    @Test
+    public void hasType(){
+        assertEquals(BedRoomType.DOUBLE, bedRoom.getType());
+    }
+
+    @Test
+    public void hasCapacity(){
+        assertEquals(2, bedRoom.getCapacity());
     }
 
 
