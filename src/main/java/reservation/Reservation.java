@@ -21,7 +21,7 @@ public class Reservation {
     private int duration;
     private ReservationStatus status;
     private HashMap<Guest, Double> guestPayments;
-    private Double balance;
+    private ArrayList<Guest> guests;
 
     public Reservation(Room room, String startingDate, int duration, ArrayList<Guest> guests) {
 
@@ -31,6 +31,8 @@ public class Reservation {
         this.startDate          = LocalDate.parse(this.startDateString);
         this.status             = ReservationStatus.ONGOING;
         calculateEndDate();
+        guestPayments           = new HashMap<>();
+        this.guests             = guests;
     }
 
     public Room getRoom() {
@@ -99,6 +101,10 @@ public class Reservation {
         return guestPayments;
     }
 
+    public ArrayList<Guest> getGuests(){
+        return guests;
+    }
+
     public Double getTotalPricePaid(){
 
         Double totalPaid = 0.0;
@@ -113,5 +119,36 @@ public class Reservation {
 
     public Double getBalance(){
         return this.getTotalPriceToPay() - this.getTotalPricePaid();
+    }
+
+    public PaymentStatus guestMakePayment(Guest guest, Double amountPaid){
+
+        if(guest.getCurrentWallet() < amountPaid)
+        {
+            return PaymentStatus.INSUFFICIENT_CREDIT;
+        }
+        else
+        {
+            Double payment = guestPayments.get(guest);
+
+            if(payment == null)
+            {
+                guestPayments.put(guest, amountPaid);
+            }
+            else
+            {
+                guestPayments.replace(guest, payment + amountPaid);
+            }
+
+
+            guest.Pay(amountPaid);
+
+            return PaymentStatus.DONE;
+        }
+
+    }
+
+    public int getGuestsCount() {
+        return this.guests.size();
     }
 }

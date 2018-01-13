@@ -29,4 +29,11 @@ public class GuestTest {
         assertEquals(new Double(300.0), guest.getSpending());
     }
 
+    @Test
+    public void canPay(){
+        guest.Pay(50.7);
+        assertEquals(new Double(200.0), guest.getCurrentWallet());
+        assertEquals(new Double(350.7), guest.getSpending());
+    }
+
 }

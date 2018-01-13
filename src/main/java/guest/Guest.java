@@ -25,4 +25,10 @@ public class Guest {
     public Double getSpending() {
         return spending;
     }
+
+    public void Pay(Double amountPaid)
+    {
+        this.currentWallet -= amountPaid;
+        this.spending      += amountPaid;
+    }
 }

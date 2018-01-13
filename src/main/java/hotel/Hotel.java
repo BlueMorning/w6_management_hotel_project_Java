@@ -1,6 +1,9 @@
 package hotel;
 
 import guest.Guest;
+import room.bedroom.BedRoom;
+import room.conferenceRoom.ConferenceRoom;
+import room.diningRoom.DiningRoom;
 import room.room.Room;
 import reservation.Reservation;
 import reservation.ReservationStatus;
@@ -96,29 +99,67 @@ public class Hotel {
 
         Boolean isRoomAvailable = true;
 
-        for(Reservation reservation: this.getOnGoingReservationsByRoom(new_reservation.getRoom())){
+        if(    BedRoom.class.isInstance(new_reservation.getRoom())
+            || ConferenceRoom.class.isInstance(new_reservation.getRoom()))
+        {
 
-            // if the new reservation schedule start date overlaps an ongoing start date reservation
-            if(     (new_reservation.getStartDate().isBefore(reservation.getStartDate())    || new_reservation.getStartDate().equals(reservation.getStartDate()))
-                &&  (new_reservation.getEndDate().isAfter(reservation.getStartDate())       || new_reservation.getEndDate().equals(reservation.getStartDate()))
-                )
-            {
-                isRoomAvailable = false;
-                break;
+            if(new_reservation.getRoom().getCapacity() >= new_reservation.getGuestsCount()) {
+
+                for (Reservation reservation : this.getOnGoingReservationsByRoom(new_reservation.getRoom())) {
+
+                    // if the new reservation schedule start date overlaps an ongoing start date reservation
+                    if ((new_reservation.getStartDate().isBefore(reservation.getStartDate()) || new_reservation.getStartDate().equals(reservation.getStartDate()))
+                            && (new_reservation.getEndDate().isAfter(reservation.getStartDate()) || new_reservation.getEndDate().equals(reservation.getStartDate()))
+                            ) {
+                        isRoomAvailable = false;
+                        break;
+                    }
+                    // or if the new reservation schedule end date overlaps an ongoing end date reservation
+                    else if ((new_reservation.getStartDate().isBefore(reservation.getEndDate()) || new_reservation.getStartDate().equals(reservation.getEndDate()))
+                            && (new_reservation.getEndDate().isAfter(reservation.getEndDate()) || new_reservation.getEndDate().equals(reservation.getEndDate()))
+                            ) {
+                        isRoomAvailable = false;
+                        break;
+                    } else if (new_reservation.getStartDate().isAfter(reservation.getStartDate())
+                            && new_reservation.getEndDate().isBefore(reservation.getEndDate())) {
+                        isRoomAvailable = false;
+                        break;
+                    }
+                }
             }
-            // or if the new reservation schedule end date overlaps an ongoing end date reservation
-            else if(    (new_reservation.getStartDate().isBefore(reservation.getEndDate()) || new_reservation.getStartDate().equals(reservation.getEndDate()))
-                    &&  (new_reservation.getEndDate().isAfter(reservation.getEndDate())    || new_reservation.getEndDate().equals(reservation.getEndDate()))
-                    )
+            else
             {
                 isRoomAvailable = false;
-                break;
             }
-            else if(   new_reservation.getStartDate().isAfter(reservation.getStartDate())
-                    && new_reservation.getEndDate().isBefore(reservation.getEndDate()))
+        }
+        else if(DiningRoom.class.isInstance(new_reservation.getRoom()))
+        {
+            int nbSeatsAlreadyBooked = 0;
+
+            for (Reservation reservation : this.getOnGoingReservationsByRoom(new_reservation.getRoom())) {
+
+                // if the new reservation schedule start date overlaps an ongoing start date reservation
+                if ((new_reservation.getStartDate().isBefore(reservation.getStartDate()) || new_reservation.getStartDate().equals(reservation.getStartDate()))
+                        && (new_reservation.getEndDate().isAfter(reservation.getStartDate()) || new_reservation.getEndDate().equals(reservation.getStartDate()))
+                        ) {
+                    nbSeatsAlreadyBooked += reservation.getGuestsCount();
+                }
+                // or if the new reservation schedule end date overlaps an ongoing end date reservation
+                else if ((new_reservation.getStartDate().isBefore(reservation.getEndDate()) || new_reservation.getStartDate().equals(reservation.getEndDate()))
+                        && (new_reservation.getEndDate().isAfter(reservation.getEndDate()) || new_reservation.getEndDate().equals(reservation.getEndDate()))
+                        ) {
+                    nbSeatsAlreadyBooked += reservation.getGuestsCount();
+
+                } else if (new_reservation.getStartDate().isAfter(reservation.getStartDate())
+                        && new_reservation.getEndDate().isBefore(reservation.getEndDate())) {
+
+                    nbSeatsAlreadyBooked += reservation.getGuestsCount();
+                }
+            }
+
+            if(nbSeatsAlreadyBooked + new_reservation.getGuestsCount() > new_reservation.getRoom().getCapacity())
             {
                 isRoomAvailable = false;
-                break;
             }
         }
 
