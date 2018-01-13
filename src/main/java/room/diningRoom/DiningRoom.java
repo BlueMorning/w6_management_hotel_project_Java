@@ -21,4 +21,5 @@ public class DiningRoom extends Room {
     public int getMenusCount() {
         return menusList.size();
     }
+
 }

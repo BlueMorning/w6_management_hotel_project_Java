@@ -1,7 +1,7 @@
 import room.diningRoom.DiningRoom;
-import room.diningRoom.Menu;
 import org.junit.Before;
 import org.junit.Test;
+import room.diningRoom.Menu;
 
 import java.util.ArrayList;
 
@@ -19,7 +19,6 @@ public class DiningRoomTest {
         menuList.add(new Menu("Enjoyable", 15.8));
         menuList.add(new Menu("Senses", 34.5));
         menuList.add(new Menu("Experience", 60.0));
-
         diningRoom = new DiningRoom("The Gourmet", 100, menuList);
     }
 
@@ -32,6 +31,7 @@ public class DiningRoomTest {
     public void hasMenusList(){
         assertEquals(3, diningRoom.getMenusCount());
     }
+
 
 
 
