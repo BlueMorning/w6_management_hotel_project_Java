@@ -1,6 +1,6 @@
-package hotel.conferenceRoom;
+package room.conferenceRoom;
 
-import hotel.room.Room;
+import room.room.Room;
 
 public class ConferenceRoom extends Room {
 

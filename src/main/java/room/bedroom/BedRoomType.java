@@ -1,4 +1,4 @@
-package hotel.bedroom;
+package room.bedroom;
 
 public enum BedRoomType {
 

@@ -1,11 +1,10 @@
 package reservation;
 
 import guest.Guest;
-import hotel.room.Room;
+import room.room.Room;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class Reservation {
 

@@ -1,11 +1,11 @@
 import guest.Guest;
 import hotel.Hotel;
-import hotel.bedroom.BedRoom;
-import hotel.bedroom.BedRoomType;
-import hotel.conferenceRoom.ConferenceRoom;
-import hotel.diningRoom.DiningRoom;
-import hotel.diningRoom.Menu;
-import hotel.room.Room;
+import room.bedroom.BedRoom;
+import room.bedroom.BedRoomType;
+import room.conferenceRoom.ConferenceRoom;
+import room.diningRoom.DiningRoom;
+import room.diningRoom.Menu;
+import room.room.Room;
 import org.junit.Before;
 import org.junit.Test;
 import reservation.Reservation;
@@ -46,6 +46,7 @@ public class HotelTest {
         hotel = new Hotel("Laucala Island", rooms);
 
         guests = new ArrayList<>();
+        guests.add(new Guest("Luke", 300.0, 0.0));
     }
 
     @Test
@@ -100,7 +101,7 @@ public class HotelTest {
 
         assertEquals(0, hotel.getAllReservationsCount());
         hotel.checkReservationToAdd(bedRoom, "2018-01-12", 10, guests);
-        assertEquals(1, hotel.getOnGoingReservationsCount());
+        assertEquals(1, hotel.getOnGoingReservationsCountByRoom(bedRoom));
 
         Reservation reservation1 = new Reservation(bedRoom, "2018-01-10", 3, guests);
         assertEquals(false, hotel.isRoomAvailable(reservation1));

@@ -1,4 +1,4 @@
-package hotel.room;
+package room.room;
 
 public class Room {
 

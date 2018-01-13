@@ -1,6 +1,6 @@
-package hotel.diningRoom;
+package room.diningRoom;
 
-import hotel.room.Room;
+import room.room.Room;
 
 import java.util.ArrayList;
 

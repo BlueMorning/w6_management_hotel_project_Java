@@ -1,7 +1,7 @@
 package hotel;
 
 import guest.Guest;
-import hotel.room.Room;
+import room.room.Room;
 import reservation.Reservation;
 import reservation.ReservationStatus;
 
@@ -54,6 +54,23 @@ public class Hotel {
         return onGoingReservations;
     }
 
+    public ArrayList<Reservation> getOnGoingReservationsByRoom(Room room) {
+
+        ArrayList<Reservation> onGoingReservations = new ArrayList<>();
+
+        for(Reservation reservation: reservations){
+            if(reservation.getRoom() == room && reservation.getStatus() == ReservationStatus.ONGOING){
+                onGoingReservations.add(reservation);
+            }
+        }
+
+        return onGoingReservations;
+    }
+
+    public int getOnGoingReservationsCountByRoom(Room room){
+        return  getOnGoingReservationsByRoom(room).size();
+    }
+
     public int getOnGoingReservationsCount(){
         return  getOnGoingReservations().size();
     }
@@ -79,33 +96,30 @@ public class Hotel {
 
         Boolean isRoomAvailable = true;
 
-        for(Reservation reservation: this.getOnGoingReservations()){
+        for(Reservation reservation: this.getOnGoingReservationsByRoom(new_reservation.getRoom())){
 
-            // if the new reservation schedule overlaps the start date of an ongoing reservation
-            if(     (new_reservation.getStartDate().isBefore(reservation.getStartDate()) || new_reservation.getStartDate().isEqual(reservation.getStartDate()))
-                &&   new_reservation.getEndDate().isAfter(reservation.getStartDate())
+            // if the new reservation schedule start date overlaps an ongoing start date reservation
+            if(     (new_reservation.getStartDate().isBefore(reservation.getStartDate())    || new_reservation.getStartDate().equals(reservation.getStartDate()))
+                &&  (new_reservation.getEndDate().isAfter(reservation.getStartDate())       || new_reservation.getEndDate().equals(reservation.getStartDate()))
                 )
             {
                 isRoomAvailable = false;
                 break;
             }
-            // if the new reservation schedule is included in an ongoing reservation
-            else if(    (new_reservation.getStartDate().isAfter(reservation.getStartDate()) || new_reservation.getStartDate().isEqual(reservation.getStartDate()))
-                    &&  (new_reservation.getEndDate().isBefore(reservation.getEndDate()) || new_reservation.getEndDate().isEqual(reservation.getEndDate()))
+            // or if the new reservation schedule end date overlaps an ongoing end date reservation
+            else if(    (new_reservation.getStartDate().isBefore(reservation.getEndDate()) || new_reservation.getStartDate().equals(reservation.getEndDate()))
+                    &&  (new_reservation.getEndDate().isAfter(reservation.getEndDate())    || new_reservation.getEndDate().equals(reservation.getEndDate()))
                     )
             {
                 isRoomAvailable = false;
                 break;
             }
-            // if the new reservation schedule overlaps the end date of an ongoing reservation
-            else if(    new_reservation.getStartDate().isBefore(reservation.getEndDate())
-                    &&  (new_reservation.getEndDate().isAfter(reservation.getEndDate()) || new_reservation.getEndDate().isEqual(reservation.getEndDate()))
-                    )
+            else if(   new_reservation.getStartDate().isAfter(reservation.getStartDate())
+                    && new_reservation.getEndDate().isBefore(reservation.getEndDate()))
             {
                 isRoomAvailable = false;
                 break;
             }
-
         }
 
         return isRoomAvailable;
@@ -120,7 +134,7 @@ public class Hotel {
         Boolean reservationAdded = false;
         Reservation reservationToAdd = new Reservation(room, startDate, duration, guests);
 
-        if(isRoomAvailable(reservationToAdd)) {
+        if(isRoomAvailable(reservationToAdd) && guests.size() > 0) {
             reservations.add(reservationToAdd);
             reservationAdded = true;
         }

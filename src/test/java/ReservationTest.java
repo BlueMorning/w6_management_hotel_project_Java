@@ -1,5 +1,5 @@
 import guest.Guest;
-import hotel.room.Room;
+import room.room.Room;
 import org.junit.Before;
 import org.junit.Test;
 import reservation.Reservation;

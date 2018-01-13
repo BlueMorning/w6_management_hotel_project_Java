@@ -1,4 +1,4 @@
-package hotel.diningRoom;
+package room.diningRoom;
 
 public class Menu {
 

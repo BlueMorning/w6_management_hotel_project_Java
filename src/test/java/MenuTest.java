@@ -1,4 +1,4 @@
-import hotel.diningRoom.Menu;
+import room.diningRoom.Menu;
 import org.junit.Before;
 import org.junit.Test;
 
