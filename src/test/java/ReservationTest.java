@@ -57,4 +57,19 @@ public class ReservationTest {
     public void hasEndDate(){
         assertEquals(LocalDate.of(2018, 1, 21), reservation.getEndDate());
     }
+
+    @Test
+    public void hasTotalPriceToPay(){
+
+    }
+
+    @Test
+    public void hasTotalPricePaid(){
+
+    }
+
+    @Test
+    public void getBalance(){
+
+    }
 }

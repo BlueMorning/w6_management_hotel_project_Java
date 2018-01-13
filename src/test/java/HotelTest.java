@@ -31,7 +31,7 @@ public class HotelTest {
         bedRoom = new BedRoom("Orange", BedRoomType.DOUBLE, 50);
         rooms.add(bedRoom);
 
-        confRoom = new ConferenceRoom("Kennedy", 30, 500, true);
+        confRoom = new ConferenceRoom("Kennedy", 30, 500);
         rooms.add(confRoom);
 
         menuList = new ArrayList<>();

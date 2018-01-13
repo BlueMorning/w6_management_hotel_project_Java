@@ -11,7 +11,7 @@ public class ConferenceRoomTest {
 
     @Before
     public void Before(){
-        confRoom = new ConferenceRoom("Kennedy", 30, 500, true);
+        confRoom = new ConferenceRoom("Kennedy", 30, 500);
     }
 
     @Test
@@ -23,11 +23,5 @@ public class ConferenceRoomTest {
     public void hasDailyRate(){
         assertEquals(500, confRoom.getDailyRate());
     }
-
-    @Test
-    public void isSelfCatered(){
-        assertEquals(true, confRoom.isSelfCatered());
-    }
-
 
 }

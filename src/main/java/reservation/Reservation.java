@@ -1,10 +1,16 @@
 package reservation;
 
 import guest.Guest;
+import reservation.DiningReservation.DiningReservation;
+import room.bedroom.BedRoom;
+import room.conferenceRoom.ConferenceRoom;
+import room.diningRoom.DiningRoom;
+import room.diningRoom.Dinner;
 import room.room.Room;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Reservation {
 
@@ -14,6 +20,8 @@ public class Reservation {
     private LocalDate endDate;
     private int duration;
     private ReservationStatus status;
+    private HashMap<Guest, Double> guestPayments;
+    private Double balance;
 
     public Reservation(Room room, String startingDate, int duration, ArrayList<Guest> guests) {
 
@@ -64,5 +72,46 @@ public class Reservation {
 
     public void endReservation(){
         this.status = ReservationStatus.ENDED;
+    }
+
+    public Double getTotalPriceToPay(){
+
+        Double totalAmountToPay = 0.0;
+
+        if(     BedRoom.class.isInstance(room)){
+            totalAmountToPay = new Double(((BedRoom)room).getNightRate()) * this.duration;
+        }
+        else if(ConferenceRoom.class.isInstance(room))
+        {
+            totalAmountToPay = new Double(((ConferenceRoom)room).getDailyRate()) * this.duration;
+        }
+        else if(DiningRoom.class.isInstance(room))
+        {
+            totalAmountToPay = ((DiningReservation)(this)).getDinner().calculateDinnerPrice();
+        }
+
+
+        return totalAmountToPay;
+
+    }
+
+    public HashMap<Guest, Double> getGuestPayments(){
+        return guestPayments;
+    }
+
+    public Double getTotalPricePaid(){
+
+        Double totalPaid = 0.0;
+
+        for(Guest guest : guestPayments.keySet())
+        {
+            totalPaid += guestPayments.get(guest).doubleValue();
+        }
+
+        return totalPaid;
+    }
+
+    public Double getBalance(){
+        return this.getTotalPriceToPay() - this.getTotalPricePaid();
     }
 }
