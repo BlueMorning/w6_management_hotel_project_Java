@@ -226,13 +226,23 @@ public class Hotel {
     public ArrayList<Room> searchForRooms(RoomType roomType, String startDate, int duration, int guestsNumber)
     {
         ArrayList<Room> foundRooms = new ArrayList<>();
+        ArrayList<Guest> guests    = new ArrayList<>();
 
+        for(int guestNumberToAdd = 0; guestNumberToAdd < guestsNumber; guestNumberToAdd++){
+            guests.add(Guest.GetFakedGuest());
+        }
 
+        for(Room room : rooms){
 
-
+            if(        room.isActive()
+                    && room.getRoomType() == roomType
+                    && this.isRoomAvailable(new Reservation(room, startDate, duration, guests)) == ReservationRequestStatus.OK
+              ) {
+                foundRooms.add(room);
+            }
+        }
 
         return foundRooms;
-
     }
 
 

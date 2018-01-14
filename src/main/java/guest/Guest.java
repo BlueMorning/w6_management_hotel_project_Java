@@ -36,4 +36,8 @@ public class Guest {
         this.currentWallet += credit;
         return this.currentWallet;
     }
+
+    public static Guest GetFakedGuest() {
+        return new Guest("", 0.0, 0.0);
+    }
 }

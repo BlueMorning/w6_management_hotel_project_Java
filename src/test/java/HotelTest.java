@@ -9,6 +9,7 @@ import room.diningRoom.Menu;
 import room.room.Room;
 import org.junit.Before;
 import org.junit.Test;
+import room.room.RoomType;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -137,8 +138,8 @@ public class HotelTest {
         assertEquals(0, hotel.getAllReservationsCount());
 
         hotel.checkReservationToAdd(bedRoomFor2,    LocalDate.now().toString(), 3, guests);
-        hotel.checkReservationToAdd(confRoom,   LocalDate.now().toString(), 5, guests);
-        hotel.checkReservationToAdd(diningRoom, LocalDate.now().toString(), 2, guests);
+        hotel.checkReservationToAdd(confRoom,       LocalDate.now().toString(), 5, guests);
+        hotel.checkReservationToAdd(diningRoom,     LocalDate.now().toString(), 2, guests);
 
         assertEquals(3, hotel.getOnGoingReservationsCount());
 
@@ -156,6 +157,16 @@ public class HotelTest {
         hotel.checkOutAllEndedReservation();
 
         assertEquals(3, hotel.getOnGoingReservationsCount());
+    }
+
+    @Test
+    public void canSearchForRooms(){
+        ArrayList<Room> foundRooms = hotel.searchForRooms(RoomType.BEDROOM, LocalDate.now().toString(), 3, 2);
+        assertEquals(1, foundRooms.size());
+
+        hotel.checkReservationToAdd(bedRoomFor2,    LocalDate.now().toString(), 1, guests);
+        foundRooms = hotel.searchForRooms(RoomType.BEDROOM, LocalDate.now().toString(), 3, 2);
+        assertEquals(0, foundRooms.size());
     }
 
 

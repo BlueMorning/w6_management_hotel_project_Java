@@ -42,4 +42,10 @@ public class GuestTest {
         assertEquals(new Double(750.7), guest.getCurrentWallet());
     }
 
+    @Test
+    public void canFakeGuest(){
+        Guest fakedGuest = Guest.GetFakedGuest();
+        assertEquals("", fakedGuest.getName());
+    }
+
 }
