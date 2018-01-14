@@ -14,12 +14,7 @@ public class Dinner {
     public Dinner(DiningRoom diningRoom, ArrayList<Guest> guests)
     {
         this.diningRoom = diningRoom;
-
         guestsForDinner = new HashMap<>();
-
-        for(Guest guest: guests){
-            guestsForDinner.put(guest, null);
-        }
     }
 
     public HashMap<Guest, Menu> getGuestsForDinner(){
@@ -45,6 +40,9 @@ public class Dinner {
     public void orderMenuByGuest(Guest guest, Menu menu) {
         if(guestsForDinner.containsKey(guest)) {
             guestsForDinner.replace(guest, menu);
+        }
+        else{
+            guestsForDinner.put(guest, menu);
         }
     }
 

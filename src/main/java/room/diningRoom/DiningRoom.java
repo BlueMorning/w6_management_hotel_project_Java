@@ -24,4 +24,8 @@ public class DiningRoom extends Room {
         return menusList.size();
     }
 
+    public void addMenu(Menu menu){
+        this.menusList.add(menu);
+    }
+
 }

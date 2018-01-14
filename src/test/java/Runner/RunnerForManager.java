@@ -1,6 +1,7 @@
 package Runner;
 
-public class RunnerWithGuestInterraction {
+public class RunnerForManager {
+
 
     public static void main(String args[]){
 

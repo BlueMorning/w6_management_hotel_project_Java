@@ -20,19 +20,29 @@ public class Hotel {
     private String name;
     private ArrayList<Room> rooms;
     private ArrayList<Reservation> reservations;
+    private HashMap<String, Guest> guestsMap;
 
     public Hotel(String name, ArrayList<Room> roomsList) {
         this.name           = name;
         this.rooms          = roomsList;
         this.reservations   = new ArrayList<>();
+        this.guestsMap      = new HashMap<>();
     }
 
     public String getName() {
         return name;
     }
 
+    public void addGuest(Guest guest){
+        this.guestsMap.put(guest.getName(), guest);
+    }
+
     public ArrayList<Room> getRooms() {
         return rooms;
+    }
+
+    public HashMap<String, Guest> getGuestsMap(){
+        return guestsMap;
     }
 
     public int getRoomsCount() {
@@ -207,7 +217,7 @@ public class Hotel {
     }
 
 
-    public ReservationStatus checkReservationToAdd(Room room, String startDate, int duration, ArrayList<Guest> guests){
+    public Reservation checkReservationToAdd(Room room, String startDate, int duration, ArrayList<Guest> guests){
 
         checkOutAllEndedReservation();
         Reservation reservationToAdd = null;
@@ -226,7 +236,7 @@ public class Hotel {
             reservationToAdd.setStatus(ReservationStatus.ONGOING);
         }
 
-        return reservationToAdd.getStatus();
+        return reservationToAdd;
     }
 
     public void checkOutReservation(Reservation reservation){
@@ -314,5 +324,12 @@ public class Hotel {
     }
 
 
-
+    public Room getRoomByName(String roomName) {
+        for(Room room : rooms){
+            if(room.getName().equals(roomName)){
+                return room;
+            }
+        }
+        return null;
+    }
 }

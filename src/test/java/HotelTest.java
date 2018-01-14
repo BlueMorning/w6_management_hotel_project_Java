@@ -105,17 +105,17 @@ public class HotelTest {
     @Test
     public void isRoomCanBeBooked(){
 
-        ReservationStatus reservation1_status = hotel.checkReservationToAdd(bedRoomFor2, LocalDate.now().toString(), 10, guests);
+        ReservationStatus reservation1_status = hotel.checkReservationToAdd(bedRoomFor2, LocalDate.now().toString(), 10, guests).getStatus();
         assertEquals(ReservationStatus.ONGOING, reservation1_status);
 
-        ReservationStatus reservation2_status = hotel.checkReservationToAdd(bedRoomFor2, LocalDate.now().toString(), 10, guests);
+        ReservationStatus reservation2_status = hotel.checkReservationToAdd(bedRoomFor2, LocalDate.now().toString(), 10, guests).getStatus();;
         assertEquals(ReservationStatus.NOT_AVAILABLE, reservation2_status);
 
-        ReservationStatus reservation3_status = hotel.checkReservationToAdd(bedRoomFor1, LocalDate.now().toString(), 10, guests);
+        ReservationStatus reservation3_status = hotel.checkReservationToAdd(bedRoomFor1, LocalDate.now().toString(), 10, guests).getStatus();;
         assertEquals(ReservationStatus.OVER_CAPACITY, reservation3_status);
 
         hotel.checkReservationToAdd(bedRoomFor1, LocalDate.now().toString(), 10, singleguest);
-        ReservationStatus reservation4_status = hotel.checkReservationToAdd(bedRoomFor1, LocalDate.now().toString(), 10, guests);
+        ReservationStatus reservation4_status = hotel.checkReservationToAdd(bedRoomFor1, LocalDate.now().toString(), 10, guests).getStatus();;
         assertEquals(ReservationStatus.NOT_AVAILABLE_AND_OVER_CAPACITY, reservation4_status);
     }
 
