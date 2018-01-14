@@ -5,7 +5,6 @@ import reservation.DiningReservation.DiningReservation;
 import room.bedroom.BedRoom;
 import room.conferenceRoom.ConferenceRoom;
 import room.diningRoom.DiningRoom;
-import room.diningRoom.Dinner;
 import room.room.Room;
 
 import java.time.LocalDate;
@@ -29,7 +28,7 @@ public class Reservation {
         this.startDateString    = startingDate;
         this.duration           = duration;
         this.startDate          = LocalDate.parse(this.startDateString);
-        this.status             = ReservationStatus.ONGOING;
+        this.status             = ReservationStatus.PENDING;
         calculateEndDate();
         guestPayments           = new HashMap<>();
         this.guests             = guests;
@@ -150,5 +149,9 @@ public class Reservation {
 
     public int getGuestsCount() {
         return this.guests.size();
+    }
+
+    public void setStatus(ReservationStatus status) {
+        this.status = status;
     }
 }

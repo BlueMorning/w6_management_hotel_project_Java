@@ -1,6 +1,7 @@
 import guest.Guest;
 import hotel.Hotel;
-import reservation.ReservationRequestStatus;
+import reservation.DiningReservation.DiningReservation;
+import reservation.ReservationStatus;
 import room.bedroom.BedRoom;
 import room.bedroom.BedRoomType;
 import room.conferenceRoom.ConferenceRoom;
@@ -27,6 +28,9 @@ public class HotelTest {
     ArrayList<Menu> menuList;
     ArrayList<Guest> guests;
     ArrayList<Guest> singleguest;
+    Guest guest1;
+    Guest guest2;
+    Guest guest3;
 
     @Before
     public void Before(){
@@ -52,12 +56,17 @@ public class HotelTest {
 
         hotel = new Hotel("Laucala Island", rooms);
 
+
+        guest1 = new Guest("Luke", 3000.0, 0.0);
+        guest2 = new Guest("Ashley", 4000.0, 0.0);
+        guest3 = new Guest("Bruce", 1000.0, 0.0);
+
         guests = new ArrayList<>();
-        guests.add(new Guest("Luke", 300.0, 0.0));
-        guests.add(new Guest("Linda", 400.0, 0.0));
+        guests.add(guest1);
+        guests.add(guest2);
 
         singleguest = new ArrayList<>();
-        singleguest.add(new Guest("Luke", 300.0, 0.0));
+        singleguest.add(guest1);
     }
 
     @Test
@@ -93,20 +102,20 @@ public class HotelTest {
 
 
     @Test
-    public void isRoomAvailable(){
+    public void isRoomCanBeBooked(){
 
-        ReservationRequestStatus reservation1_status = hotel.checkReservationToAdd(bedRoomFor2, LocalDate.now().toString(), 10, guests);
-        assertEquals(ReservationRequestStatus.SAVED, reservation1_status);
+        ReservationStatus reservation1_status = hotel.checkReservationToAdd(bedRoomFor2, LocalDate.now().toString(), 10, guests);
+        assertEquals(ReservationStatus.ONGOING, reservation1_status);
 
-        ReservationRequestStatus reservation2_status = hotel.checkReservationToAdd(bedRoomFor2, LocalDate.now().toString(), 10, guests);
-        assertEquals(ReservationRequestStatus.NOT_AVAILABLE, reservation2_status);
+        ReservationStatus reservation2_status = hotel.checkReservationToAdd(bedRoomFor2, LocalDate.now().toString(), 10, guests);
+        assertEquals(ReservationStatus.NOT_AVAILABLE, reservation2_status);
 
-        ReservationRequestStatus reservation3_status = hotel.checkReservationToAdd(bedRoomFor1, LocalDate.now().toString(), 10, guests);
-        assertEquals(ReservationRequestStatus.OVER_CAPACITY, reservation3_status);
+        ReservationStatus reservation3_status = hotel.checkReservationToAdd(bedRoomFor1, LocalDate.now().toString(), 10, guests);
+        assertEquals(ReservationStatus.OVER_CAPACITY, reservation3_status);
 
         hotel.checkReservationToAdd(bedRoomFor1, LocalDate.now().toString(), 10, singleguest);
-        ReservationRequestStatus reservation4_status = hotel.checkReservationToAdd(bedRoomFor1, LocalDate.now().toString(), 10, guests);
-        assertEquals(ReservationRequestStatus.NOT_AVAILABLE_AND_OVER_CAPACITY, reservation4_status);
+        ReservationStatus reservation4_status = hotel.checkReservationToAdd(bedRoomFor1, LocalDate.now().toString(), 10, guests);
+        assertEquals(ReservationStatus.NOT_AVAILABLE_AND_OVER_CAPACITY, reservation4_status);
     }
 
 
@@ -170,4 +179,122 @@ public class HotelTest {
     }
 
 
+    @Test
+    public void canGetTurnoverByBedRoom(){
+        hotel.checkReservationToAdd(bedRoomFor2,    LocalDate.now().toString(), 3, guests);
+        hotel.getOnGoingReservations().get(0).guestMakePayment(guest1, 150.0);
+        assertEquals(new Double(150), hotel.getTurnoverByRoom(bedRoomFor2));
+    }
+
+    @Test
+    public void canGetTurnoverByDiningRoom(){
+        hotel.checkReservationToAdd(diningRoom,    LocalDate.now().toString(), 1, guests);
+        DiningReservation diningReservation = (DiningReservation)(hotel.getOnGoingReservations().get(0));
+        diningReservation.getDinner().orderMenuByGuest(guest1, diningRoom.getMenusList().get(0));
+        diningReservation.getDinner().orderMenuByGuest(guest2, diningRoom.getMenusList().get(1));
+
+        hotel.getOnGoingReservations().get(0).guestMakePayment(guest1, 40.0);
+        hotel.getOnGoingReservations().get(0).guestMakePayment(guest2, 5.3);
+
+        assertEquals(new Double(45.3), hotel.getTurnoverByRoom(diningRoom));
+        assertEquals(new Double(45.3), diningReservation.getTotalPricePaid());
+        assertEquals(new Double(50.3), diningReservation.getTotalPriceToPay());
+        assertEquals(new Double(5.0), diningReservation.getBalance());
+    }
+
+    @Test
+    public void canGetTurnoverByGuest(){
+
+        hotel.checkReservationToAdd(diningRoom,    LocalDate.now().toString(), 1, guests);
+        DiningReservation diningReservation = (DiningReservation)(hotel.getOnGoingReservations().get(0));
+        diningReservation.getDinner().orderMenuByGuest(guest1, diningRoom.getMenusList().get(0));
+        diningReservation.getDinner().orderMenuByGuest(guest2, diningRoom.getMenusList().get(1));
+
+        hotel.getOnGoingReservations().get(0).guestMakePayment(guest1, 40.0);
+        hotel.getOnGoingReservations().get(0).guestMakePayment(guest2, 5.3);
+
+        hotel.checkReservationToAdd(bedRoomFor2,    LocalDate.now().toString(), 3, guests);
+        hotel.getOnGoingReservations().get(0).guestMakePayment(guest1, 100.0);
+        hotel.getOnGoingReservations().get(0).guestMakePayment(guest2, 50.0);
+
+        assertEquals(new Double(140.0), hotel.getTurnoverByGuest(guest1));
+        assertEquals(new Double(55.3), hotel.getTurnoverByGuest(guest2));
+    }
+
+    @Test
+    public void canGetTotalTurnover(){
+
+        hotel.checkReservationToAdd(diningRoom,    LocalDate.now().toString(), 1, guests);
+        DiningReservation diningReservation = (DiningReservation)(hotel.getOnGoingReservations().get(0));
+        diningReservation.getDinner().orderMenuByGuest(guest1, diningRoom.getMenusList().get(0));
+        diningReservation.getDinner().orderMenuByGuest(guest2, diningRoom.getMenusList().get(1));
+
+        hotel.getOnGoingReservations().get(0).guestMakePayment(guest1, 40.0);
+        hotel.getOnGoingReservations().get(0).guestMakePayment(guest2, 5.3);
+
+        hotel.checkReservationToAdd(bedRoomFor2,    LocalDate.now().toString(), 3, guests);
+        hotel.getOnGoingReservations().get(1).guestMakePayment(guest1, 100.0);
+        hotel.getOnGoingReservations().get(1).guestMakePayment(guest2, 50.0);
+
+
+        hotel.checkReservationToAdd(confRoom,       LocalDate.now().toString(), 4, guests);
+        hotel.getOnGoingReservations().get(2).guestMakePayment(guest2, 1500.0);
+
+        assertEquals(new Double(1695.3), hotel.getTotalTurnover());
+
+    }
+
+    @Test
+    public void canGetTurnoverForAllRooms(){
+
+        hotel.checkReservationToAdd(diningRoom,    LocalDate.now().toString(), 1, guests);
+        DiningReservation diningReservation = (DiningReservation)(hotel.getOnGoingReservations().get(0));
+        diningReservation.getDinner().orderMenuByGuest(guest1, diningRoom.getMenusList().get(0));
+        diningReservation.getDinner().orderMenuByGuest(guest2, diningRoom.getMenusList().get(1));
+
+        hotel.getOnGoingReservations().get(0).guestMakePayment(guest1, 40.0);
+        hotel.getOnGoingReservations().get(0).guestMakePayment(guest2, 5.3);
+
+        hotel.checkReservationToAdd(bedRoomFor2,    LocalDate.now().toString(), 3, guests);
+        hotel.getOnGoingReservations().get(1).guestMakePayment(guest1, 100.0);
+        hotel.getOnGoingReservations().get(1).guestMakePayment(guest2, 50.0);
+
+
+        hotel.checkReservationToAdd(confRoom,       LocalDate.now().toString(), 4, guests);
+        hotel.getOnGoingReservations().get(2).guestMakePayment(guest2, 1500.0);
+
+        assertEquals(4, hotel.getTurnoverForAllRooms().size());
+
+        assertEquals(new Double(45.3),      hotel.getTurnoverByRoom(diningRoom));
+        assertEquals(new Double(150.0),     hotel.getTurnoverByRoom(bedRoomFor2));
+        assertEquals(new Double(1500.0),    hotel.getTurnoverByRoom(confRoom));
+        assertEquals(new Double(0.0),       hotel.getTurnoverByRoom(bedRoomFor1));
+    }
+
+    @Test
+    public void canGetTurnoverForAllGuests(){
+
+        hotel.checkReservationToAdd(diningRoom,    LocalDate.now().toString(), 1, guests);
+        DiningReservation diningReservation = (DiningReservation)(hotel.getOnGoingReservations().get(0));
+        diningReservation.getDinner().orderMenuByGuest(guest1, diningRoom.getMenusList().get(0));
+        diningReservation.getDinner().orderMenuByGuest(guest2, diningRoom.getMenusList().get(1));
+
+        hotel.getOnGoingReservations().get(0).guestMakePayment(guest1, 40.0);
+        hotel.getOnGoingReservations().get(0).guestMakePayment(guest2, 5.3);
+
+        hotel.checkReservationToAdd(bedRoomFor2,    LocalDate.now().toString(), 3, guests);
+        hotel.getOnGoingReservations().get(1).guestMakePayment(guest1, 100.0);
+        hotel.getOnGoingReservations().get(1).guestMakePayment(guest2, 50.0);
+
+
+        hotel.checkReservationToAdd(confRoom,       LocalDate.now().toString(), 4, guests);
+        hotel.getOnGoingReservations().get(2).guestMakePayment(guest2, 1500.0);
+
+        assertEquals(4, hotel.getTurnoverForAllRooms().size());
+
+
+        assertEquals(new Double(140.0),   hotel.getTurnoverByGuest(guest1));
+        assertEquals(new Double(1555.3),  hotel.getTurnoverByGuest(guest2));
+        assertEquals(new Double(0.0),     hotel.getTurnoverByGuest(guest3));
+    }
 }

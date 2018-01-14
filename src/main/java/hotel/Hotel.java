@@ -1,14 +1,13 @@
 package hotel;
 
 import guest.Guest;
-import reservation.ReservationRequestStatus;
-import room.bedroom.BedRoom;
-import room.conferenceRoom.ConferenceRoom;
+import reservation.DiningReservation.DiningReservation;
 import room.diningRoom.DiningRoom;
 import room.room.Room;
 import reservation.Reservation;
 import reservation.ReservationStatus;
 import room.room.RoomType;
+import turnover.Turnover;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -97,7 +96,24 @@ public class Hotel {
         return  getEndedReservations().size();
     }
 
-    public ReservationRequestStatus isRoomAvailable(Reservation new_reservation) {
+    public ArrayList<Guest> getAllGuestPayers(){
+
+        ArrayList<Guest> guestPayers = new ArrayList<>();
+
+        for(Reservation reservation : reservations){
+            for(Guest guestPayer: reservation.getGuestPayments().keySet()){
+
+                if(! guestPayers.contains(guestPayer))
+                {
+                    guestPayers.add(guestPayer);
+                }
+            }
+        }
+
+        return guestPayers;
+    }
+
+    public ReservationStatus isReservationCanBeMade(Reservation new_reservation) {
 
         Boolean isRoomAvailable      = true;
         Boolean isCapacitySufficient = true;
@@ -170,36 +186,45 @@ public class Hotel {
 
         if(isRoomAvailable && ! isCapacitySufficient)
         {
-            return ReservationRequestStatus.OVER_CAPACITY;
+             new_reservation.setStatus(ReservationStatus.OVER_CAPACITY);
         }
         else if(! isRoomAvailable && isCapacitySufficient)
         {
-            return ReservationRequestStatus.NOT_AVAILABLE;
+            new_reservation.setStatus(ReservationStatus.NOT_AVAILABLE);
         }
         else if(! isRoomAvailable && ! isCapacitySufficient)
         {
-            return ReservationRequestStatus.NOT_AVAILABLE_AND_OVER_CAPACITY;
+            new_reservation.setStatus(ReservationStatus.NOT_AVAILABLE_AND_OVER_CAPACITY);
         }
         else
         {
-            return ReservationRequestStatus.OK;
+            new_reservation.setStatus(ReservationStatus.READY_FOR_BOOKING);
         }
+
+        return new_reservation.getStatus();
     }
 
 
-    public ReservationRequestStatus checkReservationToAdd(Room room, String startDate, int duration,  ArrayList<Guest> guests){
+    public ReservationStatus checkReservationToAdd(Room room, String startDate, int duration, ArrayList<Guest> guests){
 
         checkOutAllEndedReservation();
+        Reservation reservationToAdd = null;
 
-        Reservation reservationToAdd               = new Reservation(room, startDate, duration, guests);
-        ReservationRequestStatus reservationStatus = isRoomAvailable(reservationToAdd);
-
-        if(reservationStatus == ReservationRequestStatus.OK) {
-            reservations.add(reservationToAdd);
-            reservationStatus = ReservationRequestStatus.SAVED;
+        if(     room.getRoomType() == RoomType.BEDROOM || room.getRoomType() == RoomType.CONFROOM) {
+            reservationToAdd = new Reservation(room, startDate, duration, guests);
+        }
+        else if(room.getRoomType() == RoomType.DININGROOM ){
+            reservationToAdd = new DiningReservation((DiningRoom)room, startDate, duration, guests);
         }
 
-        return reservationStatus;
+        isReservationCanBeMade(reservationToAdd);
+
+        if(reservationToAdd.getStatus() == ReservationStatus.READY_FOR_BOOKING) {
+            reservations.add(reservationToAdd);
+            reservationToAdd.setStatus(ReservationStatus.ONGOING);
+        }
+
+        return reservationToAdd.getStatus();
     }
 
     public void checkOutReservation(Reservation reservation){
@@ -236,7 +261,7 @@ public class Hotel {
 
             if(        room.isActive()
                     && room.getRoomType() == roomType
-                    && this.isRoomAvailable(new Reservation(room, startDate, duration, guests)) == ReservationRequestStatus.OK
+                    && this.isReservationCanBeMade(new Reservation(room, startDate, duration, guests)) == ReservationStatus.READY_FOR_BOOKING
               ) {
                 foundRooms.add(room);
             }
@@ -244,6 +269,48 @@ public class Hotel {
 
         return foundRooms;
     }
+
+
+    public Double getTurnoverByRoom(Room room){
+
+        return new Turnover(room).calculateTurnoverByRoom(this.reservations);
+    }
+
+    public ArrayList<Turnover> getTurnoverForAllRooms(){
+
+        ArrayList<Turnover> roomsTurnover = new ArrayList<>();
+
+        for(Room room: rooms){
+            Turnover turnover = new Turnover(room);
+            turnover.calculateTotalTurnover(this.reservations);
+            roomsTurnover.add(turnover);
+        }
+
+        return roomsTurnover;
+    }
+
+    public Double getTurnoverByGuest(Guest guest){
+        return new Turnover(guest).calculateTurnoverByGuest(this.reservations);
+    }
+
+    public ArrayList<Turnover> getTurnoverForAllGuests(){
+
+        ArrayList<Turnover> guestsTurnover = new ArrayList<>();
+
+        for(Guest guest: this.getAllGuestPayers()){
+            Turnover turnover = new Turnover(guest);
+            turnover.calculateTotalTurnover(this.reservations);
+            guestsTurnover.add(turnover);
+        }
+
+        return guestsTurnover;
+    }
+
+    public Double getTotalTurnover(){
+
+        return Turnover.calculateTotalTurnover(this.reservations);
+    }
+
 
 
 }
