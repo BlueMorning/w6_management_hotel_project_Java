@@ -2,7 +2,6 @@ import guest.Guest;
 import reservation.PaymentStatus;
 import room.bedroom.BedRoom;
 import room.bedroom.BedRoomType;
-import room.room.Room;
 import org.junit.Before;
 import org.junit.Test;
 import reservation.Reservation;

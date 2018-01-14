@@ -31,4 +31,9 @@ public class Guest {
         this.currentWallet -= amountPaid;
         this.spending      += amountPaid;
     }
+
+    public Double creditWallet(Double credit){
+        this.currentWallet += credit;
+        return this.currentWallet;
+    }
 }

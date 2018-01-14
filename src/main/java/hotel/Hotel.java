@@ -110,14 +110,16 @@ public class Hotel {
                     // if the new reservation schedule start date overlaps an ongoing start date reservation
                     if ((new_reservation.getStartDate().isBefore(reservation.getStartDate()) || new_reservation.getStartDate().equals(reservation.getStartDate()))
                             && (new_reservation.getEndDate().isAfter(reservation.getStartDate()) || new_reservation.getEndDate().equals(reservation.getStartDate()))
-                            ) {
+                            )
+                    {
                         isRoomAvailable = false;
                         break;
                     }
                     // or if the new reservation schedule end date overlaps an ongoing end date reservation
                     else if ((new_reservation.getStartDate().isBefore(reservation.getEndDate()) || new_reservation.getStartDate().equals(reservation.getEndDate()))
                             && (new_reservation.getEndDate().isAfter(reservation.getEndDate()) || new_reservation.getEndDate().equals(reservation.getEndDate()))
-                            ) {
+                            )
+                    {
                         isRoomAvailable = false;
                         break;
                     } else if (new_reservation.getStartDate().isAfter(reservation.getStartDate())
@@ -141,17 +143,20 @@ public class Hotel {
                 // if the new reservation schedule start date overlaps an ongoing start date reservation
                 if ((new_reservation.getStartDate().isBefore(reservation.getStartDate()) || new_reservation.getStartDate().equals(reservation.getStartDate()))
                         && (new_reservation.getEndDate().isAfter(reservation.getStartDate()) || new_reservation.getEndDate().equals(reservation.getStartDate()))
-                        ) {
+                        )
+                {
                     nbSeatsAlreadyBooked += reservation.getGuestsCount();
                 }
                 // or if the new reservation schedule end date overlaps an ongoing end date reservation
                 else if ((new_reservation.getStartDate().isBefore(reservation.getEndDate()) || new_reservation.getStartDate().equals(reservation.getEndDate()))
                         && (new_reservation.getEndDate().isAfter(reservation.getEndDate()) || new_reservation.getEndDate().equals(reservation.getEndDate()))
-                        ) {
+                        )
+                {
                     nbSeatsAlreadyBooked += reservation.getGuestsCount();
 
                 } else if (new_reservation.getStartDate().isAfter(reservation.getStartDate())
-                        && new_reservation.getEndDate().isBefore(reservation.getEndDate())) {
+                        && new_reservation.getEndDate().isBefore(reservation.getEndDate()))
+                {
 
                     nbSeatsAlreadyBooked += reservation.getGuestsCount();
                 }
@@ -166,11 +171,10 @@ public class Hotel {
         return isRoomAvailable;
     }
 
-    private void addReservation(Reservation reservation){
-        reservations.add(reservation);
-    }
 
     public Boolean checkReservationToAdd(Room room, String startDate, int duration,  ArrayList<Guest> guests){
+
+        checkOutAllEndedReservation();
 
         Boolean reservationAdded = false;
         Reservation reservationToAdd = new Reservation(room, startDate, duration, guests);
@@ -196,6 +200,11 @@ public class Hotel {
                 reservation.endReservation();
             }
         }
+    }
+
+    public int addNewRoom(Room new_room){
+        this.rooms.add(new_room);
+        return this.getRoomsCount();
     }
 
 }

@@ -36,4 +36,10 @@ public class GuestTest {
         assertEquals(new Double(350.7), guest.getSpending());
     }
 
+    @Test
+    public void canCreditwallet(){
+        guest.creditWallet(500.0);
+        assertEquals(new Double(750.7), guest.getCurrentWallet());
+    }
+
 }

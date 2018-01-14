@@ -23,6 +23,16 @@ public class RoomTest {
         assertEquals(2, room.getCapacity());
     }
 
+    @Test
+    public void hasIsActive(){
+        assertEquals(true, room.isActive());
+    }
+
+    @Test
+    public void canSetIsActive(){
+        room.setIsActive(false);
+        assertEquals(false, room.isActive());
+    }
 
 
 }

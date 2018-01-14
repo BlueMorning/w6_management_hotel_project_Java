@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import reservation.Reservation;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
@@ -57,6 +58,12 @@ public class HotelTest {
     @Test
     public void hasRooms(){
         assertEquals(3, hotel.getRoomsCount());
+    }
+
+    @Test
+    public void canAddRoom(){
+        hotel.addNewRoom(new BedRoom("Magic", BedRoomType.DOUBLE, 100));
+        assertEquals(4, hotel.getRoomsCount());
     }
 
     @Test
@@ -128,18 +135,31 @@ public class HotelTest {
     @Test
     public void canCheckOutAllReservations(){
 
+        // Note the checkOutAllEndedReservation method is called inside the checkReservationToAdd method
+        // in order to end automatically the reservations which have ended.
         assertEquals(0, hotel.getAllReservationsCount());
-        hotel.checkReservationToAdd(bedRoom,    "2018-01-02", 3, guests);
-        hotel.checkReservationToAdd(confRoom,   "2018-01-05", 5, guests);
-        hotel.checkReservationToAdd(diningRoom, "2018-01-10", 2, guests);
+
+        hotel.checkReservationToAdd(bedRoom,    LocalDate.now().toString(), 3, guests);
+        hotel.checkReservationToAdd(confRoom,   LocalDate.now().toString(), 5, guests);
+        hotel.checkReservationToAdd(diningRoom, LocalDate.now().toString(), 2, guests);
 
         assertEquals(3, hotel.getOnGoingReservationsCount());
 
         hotel.checkOutAllEndedReservation();
 
-        assertEquals(0, hotel.getOnGoingReservationsCount());
-    }
+        assertEquals(3, hotel.getOnGoingReservationsCount());
 
+        hotel.checkReservationToAdd(bedRoom,    "2018-01-03", 3, guests);
+        assertEquals(4, hotel.getOnGoingReservationsCount());
+        hotel.checkReservationToAdd(confRoom,   "2018-01-03", 5, guests);
+        assertEquals(4, hotel.getOnGoingReservationsCount());
+        hotel.checkReservationToAdd(diningRoom, "2018-01-03", 2, guests);
+        assertEquals(4, hotel.getOnGoingReservationsCount());
+
+        hotel.checkOutAllEndedReservation();
+
+        assertEquals(3, hotel.getOnGoingReservationsCount());
+    }
 
 
 }
