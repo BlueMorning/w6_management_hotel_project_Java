@@ -8,7 +8,8 @@ import room.conferenceRoom.ConferenceRoom;
 import room.diningRoom.DiningRoom;
 import room.diningRoom.Menu;
 import room.room.Room;
-import turnover.Turnover;
+import turnover.GuestTurnover;
+import turnover.RoomTurnover;
 
 import java.util.ArrayList;
 
@@ -17,7 +18,8 @@ import static org.junit.Assert.assertEquals;
 
 public class TurnoverTest {
 
-    Turnover turnover;
+    RoomTurnover  roomTurnover;
+    GuestTurnover guestTurnover;
 
     Hotel hotel;
     ArrayList<Room> rooms;
@@ -28,6 +30,7 @@ public class TurnoverTest {
     ArrayList<Menu> menuList;
     ArrayList<Guest> guests;
     ArrayList<Guest> singleguest;
+
     Guest guest1;
     Guest guest2;
 
@@ -72,8 +75,8 @@ public class TurnoverTest {
         hotel.checkReservationToAdd(bedRoomFor2, "2018-01-01", 10, guests);
         hotel.getOnGoingReservationsByRoom(bedRoomFor2).get(0).guestMakePayment(guest1, 500.0);
 
-        turnover = new Turnover(bedRoomFor2);
-        assertEquals(new Double(500.0), turnover.calculateTurnoverByRoom(hotel.getAllReservations()));
+        roomTurnover = new RoomTurnover(bedRoomFor2);
+        assertEquals(new Double(500.0), roomTurnover.calculateTurnoverByRoom(hotel.getAllReservations()));
     }
 
     @Test
@@ -81,11 +84,11 @@ public class TurnoverTest {
         hotel.checkReservationToAdd(bedRoomFor2, "2018-01-01", 10, guests);
         hotel.getOnGoingReservationsByRoom(bedRoomFor2).get(0).guestMakePayment(guests.get(0), 500.0);
 
-        turnover = new Turnover(guest1);
-        assertEquals(new Double(500.0), turnover.calculateTurnoverByGuest(hotel.getAllReservations()));
+        guestTurnover = new GuestTurnover(guest1);
+        assertEquals(new Double(500.0), guestTurnover.calculateTurnoverByGuest(hotel.getAllReservations()));
 
-        turnover = new Turnover(guest2);
-        assertEquals(new Double(0.0), turnover.calculateTurnoverByGuest(hotel.getAllReservations()));
+        guestTurnover = new GuestTurnover(guest2);
+        assertEquals(new Double(0.0), guestTurnover.calculateTurnoverByGuest(hotel.getAllReservations()));
     }
 
 }

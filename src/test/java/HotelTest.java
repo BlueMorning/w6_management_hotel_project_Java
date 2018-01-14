@@ -11,6 +11,7 @@ import room.room.Room;
 import org.junit.Before;
 import org.junit.Test;
 import room.room.RoomType;
+import turnover.GuestTurnover;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -290,11 +291,10 @@ public class HotelTest {
         hotel.checkReservationToAdd(confRoom,       LocalDate.now().toString(), 4, guests);
         hotel.getOnGoingReservations().get(2).guestMakePayment(guest2, 1500.0);
 
-        assertEquals(4, hotel.getTurnoverForAllRooms().size());
+        assertEquals(2, hotel.getTurnoverForAllGuests().size());
 
-
-        assertEquals(new Double(140.0),   hotel.getTurnoverByGuest(guest1));
-        assertEquals(new Double(1555.3),  hotel.getTurnoverByGuest(guest2));
+        assertEquals(new Double(140.0),   hotel.getTurnoverForAllGuests().get(guest1).getTurnover());
+        assertEquals(new Double(1555.3),  hotel.getTurnoverForAllGuests().get(guest2).getTurnover());
         assertEquals(new Double(0.0),     hotel.getTurnoverByGuest(guest3));
     }
 }

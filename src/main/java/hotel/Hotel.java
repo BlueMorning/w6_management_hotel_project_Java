@@ -7,10 +7,12 @@ import room.room.Room;
 import reservation.Reservation;
 import reservation.ReservationStatus;
 import room.room.RoomType;
-import turnover.Turnover;
+import turnover.GuestTurnover;
+import turnover.RoomTurnover;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Hotel {
 
@@ -273,34 +275,34 @@ public class Hotel {
 
     public Double getTurnoverByRoom(Room room){
 
-        return new Turnover(room).calculateTurnoverByRoom(this.reservations);
+        return new RoomTurnover(room).calculateTurnoverByRoom(this.reservations);
     }
 
-    public ArrayList<Turnover> getTurnoverForAllRooms(){
+    public HashMap<Room, RoomTurnover> getTurnoverForAllRooms(){
 
-        ArrayList<Turnover> roomsTurnover = new ArrayList<>();
+        HashMap<Room, RoomTurnover> roomsTurnover = new HashMap<>();
 
         for(Room room: rooms){
-            Turnover turnover = new Turnover(room);
+            RoomTurnover turnover = new RoomTurnover(room);
             turnover.calculateTotalTurnover(this.reservations);
-            roomsTurnover.add(turnover);
+            roomsTurnover.put(room, turnover);
         }
 
         return roomsTurnover;
     }
 
     public Double getTurnoverByGuest(Guest guest){
-        return new Turnover(guest).calculateTurnoverByGuest(this.reservations);
+        return new GuestTurnover(guest).calculateTurnoverByGuest(this.reservations);
     }
 
-    public ArrayList<Turnover> getTurnoverForAllGuests(){
+    public HashMap<Guest, GuestTurnover> getTurnoverForAllGuests(){
 
-        ArrayList<Turnover> guestsTurnover = new ArrayList<>();
+        HashMap<Guest, GuestTurnover> guestsTurnover = new HashMap<>();
 
         for(Guest guest: this.getAllGuestPayers()){
-            Turnover turnover = new Turnover(guest);
-            turnover.calculateTotalTurnover(this.reservations);
-            guestsTurnover.add(turnover);
+            GuestTurnover turnover = new GuestTurnover(guest);
+            turnover.calculateTurnoverByGuest(this.reservations);
+            guestsTurnover.put(guest, turnover);
         }
 
         return guestsTurnover;
@@ -308,7 +310,7 @@ public class Hotel {
 
     public Double getTotalTurnover(){
 
-        return Turnover.calculateTotalTurnover(this.reservations);
+        return RoomTurnover.calculateTotalTurnover(this.reservations);
     }
 
 
