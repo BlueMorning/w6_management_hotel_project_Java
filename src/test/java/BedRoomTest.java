@@ -2,6 +2,7 @@ import room.bedroom.BedRoom;
 import room.bedroom.BedRoomType;
 import org.junit.Before;
 import org.junit.Test;
+import room.room.RoomType;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,6 +36,9 @@ public class BedRoomTest {
         assertEquals(2, bedRoom.getCapacity());
     }
 
-
+    @Test
+    public void hasRoomType(){
+        assertEquals(RoomType.BEDROOM, bedRoom.getRoomType());
+    }
 
 }

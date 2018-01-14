@@ -2,6 +2,7 @@ import room.diningRoom.DiningRoom;
 import org.junit.Before;
 import org.junit.Test;
 import room.diningRoom.Menu;
+import room.room.RoomType;
 
 import java.util.ArrayList;
 
@@ -30,6 +31,11 @@ public class DiningRoomTest {
     @Test
     public void hasMenusList(){
         assertEquals(3, diningRoom.getMenusCount());
+    }
+
+    @Test
+    public void hasRoomType(){
+        assertEquals(RoomType.DININGROOM ,diningRoom.getRoomType());
     }
 
 

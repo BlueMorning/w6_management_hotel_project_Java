@@ -207,4 +207,16 @@ public class Hotel {
         return this.getRoomsCount();
     }
 
+
+    public ArrayList<Room> searchForRooms()
+    {
+        ArrayList<Room> foundRooms = new ArrayList<>();
+
+
+
+        return foundRooms;
+
+    }
+
+
 }

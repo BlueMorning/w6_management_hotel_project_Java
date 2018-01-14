@@ -1,6 +1,7 @@
 import room.room.Room;
 import org.junit.Before;
 import org.junit.Test;
+import room.room.RoomType;
 
 import static org.junit.Assert.assertEquals;
 
@@ -34,5 +35,9 @@ public class RoomTest {
         assertEquals(false, room.isActive());
     }
 
+    @Test
+    public void hasRoomType(){
+        assertEquals(RoomType.ROOM, room.getRoomType());
+    }
 
 }

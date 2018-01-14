@@ -1,6 +1,7 @@
 package room.bedroom;
 
 import room.room.Room;
+import room.room.RoomType;
 
 public class BedRoom extends Room {
 
@@ -12,6 +13,7 @@ public class BedRoom extends Room {
         super(name, bedRoomType.getCapacity());
         this.nightRate = nightRate;
         this.type      = bedRoomType;
+        this.roomType  = RoomType.BEDROOM;
     }
 
     public int getNightRate(){
