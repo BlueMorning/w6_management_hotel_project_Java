@@ -1,5 +1,6 @@
 import guest.Guest;
 import hotel.Hotel;
+import reservation.ReservationRequestStatus;
 import room.bedroom.BedRoom;
 import room.bedroom.BedRoomType;
 import room.conferenceRoom.ConferenceRoom;
@@ -8,7 +9,6 @@ import room.diningRoom.Menu;
 import room.room.Room;
 import org.junit.Before;
 import org.junit.Test;
-import reservation.Reservation;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,18 +19,23 @@ public class HotelTest {
 
     Hotel hotel;
     ArrayList<Room> rooms;
-    BedRoom bedRoom;
+    BedRoom bedRoomFor1;
+    BedRoom bedRoomFor2;
     ConferenceRoom confRoom;
     DiningRoom diningRoom;
     ArrayList<Menu> menuList;
     ArrayList<Guest> guests;
+    ArrayList<Guest> singleguest;
 
     @Before
     public void Before(){
         rooms   = new ArrayList<>();
 
-        bedRoom = new BedRoom("Orange", BedRoomType.DOUBLE, 50);
-        rooms.add(bedRoom);
+        bedRoomFor2 = new BedRoom("Orange", BedRoomType.DOUBLE, 50);
+        rooms.add(bedRoomFor2);
+
+        bedRoomFor1 = new BedRoom("Zen", BedRoomType.SINGLE, 50);
+        rooms.add(bedRoomFor1);
 
         confRoom = new ConferenceRoom("Kennedy", 30, 500);
         rooms.add(confRoom);
@@ -48,6 +53,10 @@ public class HotelTest {
 
         guests = new ArrayList<>();
         guests.add(new Guest("Luke", 300.0, 0.0));
+        guests.add(new Guest("Linda", 400.0, 0.0));
+
+        singleguest = new ArrayList<>();
+        singleguest.add(new Guest("Luke", 300.0, 0.0));
     }
 
     @Test
@@ -57,13 +66,13 @@ public class HotelTest {
 
     @Test
     public void hasRooms(){
-        assertEquals(3, hotel.getRoomsCount());
+        assertEquals(4, hotel.getRoomsCount());
     }
 
     @Test
     public void canAddRoom(){
         hotel.addNewRoom(new BedRoom("Magic", BedRoomType.DOUBLE, 100));
-        assertEquals(4, hotel.getRoomsCount());
+        assertEquals(5, hotel.getRoomsCount());
     }
 
     @Test
@@ -83,48 +92,36 @@ public class HotelTest {
 
 
     @Test
-    public void isRoomAvailable_true(){
-        Reservation reservation1 = new Reservation(bedRoom, "2018-01-12", 10, guests);
-        assertEquals(true, hotel.isRoomAvailable(reservation1));
+    public void isRoomAvailable(){
 
-        Reservation reservation2 = new Reservation(bedRoom, "2018-01-10", 1, guests);
-        assertEquals(true, hotel.isRoomAvailable(reservation2));
+        ReservationRequestStatus reservation1_status = hotel.checkReservationToAdd(bedRoomFor2, LocalDate.now().toString(), 10, guests);
+        assertEquals(ReservationRequestStatus.SAVED, reservation1_status);
 
-        Reservation reservation3 = new Reservation(bedRoom, "2018-01-23", 3, guests);
-        assertEquals(true, hotel.isRoomAvailable(reservation3));
+        ReservationRequestStatus reservation2_status = hotel.checkReservationToAdd(bedRoomFor2, LocalDate.now().toString(), 10, guests);
+        assertEquals(ReservationRequestStatus.NOT_AVAILABLE, reservation2_status);
+
+        ReservationRequestStatus reservation3_status = hotel.checkReservationToAdd(bedRoomFor1, LocalDate.now().toString(), 10, guests);
+        assertEquals(ReservationRequestStatus.OVER_CAPACITY, reservation3_status);
+
+        hotel.checkReservationToAdd(bedRoomFor1, LocalDate.now().toString(), 10, singleguest);
+        ReservationRequestStatus reservation4_status = hotel.checkReservationToAdd(bedRoomFor1, LocalDate.now().toString(), 10, guests);
+        assertEquals(ReservationRequestStatus.NOT_AVAILABLE_AND_OVER_CAPACITY, reservation4_status);
     }
 
 
     @Test
     public void canAddReservation(){
         assertEquals(0, hotel.getAllReservationsCount());
-        hotel.checkReservationToAdd(bedRoom, "2018-01-12", 10, guests);
+        hotel.checkReservationToAdd(bedRoomFor2, "2018-01-12", 10, guests);
         assertEquals(1, hotel.getOnGoingReservationsCount());
     }
 
 
     @Test
-    public void isRoomAvailable_false(){
-
-        assertEquals(0, hotel.getAllReservationsCount());
-        hotel.checkReservationToAdd(bedRoom, "2018-01-12", 10, guests);
-        assertEquals(1, hotel.getOnGoingReservationsCountByRoom(bedRoom));
-
-        Reservation reservation1 = new Reservation(bedRoom, "2018-01-10", 3, guests);
-        assertEquals(false, hotel.isRoomAvailable(reservation1));
-
-        Reservation reservation2 = new Reservation(bedRoom, "2018-01-13", 2, guests);
-        assertEquals(false, hotel.isRoomAvailable(reservation2));
-
-        Reservation reservation3 = new Reservation(bedRoom, "2018-01-21", 7, guests);
-        assertEquals(false, hotel.isRoomAvailable(reservation3));
-    }
-
-    @Test
     public void canCheckOutReservation(){
 
         assertEquals(0, hotel.getAllReservationsCount());
-        hotel.checkReservationToAdd(bedRoom, "2018-01-02", 3, guests);
+        hotel.checkReservationToAdd(bedRoomFor2, "2018-01-02", 3, guests);
         assertEquals(1, hotel.getOnGoingReservationsCount());
 
         hotel.checkOutReservation(hotel.getOnGoingReservations().get(0));
@@ -139,7 +136,7 @@ public class HotelTest {
         // in order to end automatically the reservations which have ended.
         assertEquals(0, hotel.getAllReservationsCount());
 
-        hotel.checkReservationToAdd(bedRoom,    LocalDate.now().toString(), 3, guests);
+        hotel.checkReservationToAdd(bedRoomFor2,    LocalDate.now().toString(), 3, guests);
         hotel.checkReservationToAdd(confRoom,   LocalDate.now().toString(), 5, guests);
         hotel.checkReservationToAdd(diningRoom, LocalDate.now().toString(), 2, guests);
 
@@ -149,7 +146,7 @@ public class HotelTest {
 
         assertEquals(3, hotel.getOnGoingReservationsCount());
 
-        hotel.checkReservationToAdd(bedRoom,    "2018-01-03", 3, guests);
+        hotel.checkReservationToAdd(bedRoomFor2,    "2018-01-03", 3, guests);
         assertEquals(4, hotel.getOnGoingReservationsCount());
         hotel.checkReservationToAdd(confRoom,   "2018-01-03", 5, guests);
         assertEquals(4, hotel.getOnGoingReservationsCount());

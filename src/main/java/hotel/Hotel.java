@@ -1,12 +1,14 @@
 package hotel;
 
 import guest.Guest;
+import reservation.ReservationRequestStatus;
 import room.bedroom.BedRoom;
 import room.conferenceRoom.ConferenceRoom;
 import room.diningRoom.DiningRoom;
 import room.room.Room;
 import reservation.Reservation;
 import reservation.ReservationStatus;
+import room.room.RoomType;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -95,46 +97,43 @@ public class Hotel {
         return  getEndedReservations().size();
     }
 
-    public boolean isRoomAvailable(Reservation new_reservation) {
+    public ReservationRequestStatus isRoomAvailable(Reservation new_reservation) {
 
-        Boolean isRoomAvailable = true;
+        Boolean isRoomAvailable      = true;
+        Boolean isCapacitySufficient = true;
 
-        if(    BedRoom.class.isInstance(new_reservation.getRoom())
-            || ConferenceRoom.class.isInstance(new_reservation.getRoom()))
+        if(    new_reservation.getRoom().getRoomType() == RoomType.BEDROOM
+            || new_reservation.getRoom().getRoomType() == RoomType.CONFROOM)
         {
 
-            if(new_reservation.getRoom().getCapacity() >= new_reservation.getGuestsCount()) {
 
-                for (Reservation reservation : this.getOnGoingReservationsByRoom(new_reservation.getRoom())) {
+            for (Reservation reservation : this.getOnGoingReservationsByRoom(new_reservation.getRoom())) {
 
-                    // if the new reservation schedule start date overlaps an ongoing start date reservation
-                    if ((new_reservation.getStartDate().isBefore(reservation.getStartDate()) || new_reservation.getStartDate().equals(reservation.getStartDate()))
-                            && (new_reservation.getEndDate().isAfter(reservation.getStartDate()) || new_reservation.getEndDate().equals(reservation.getStartDate()))
-                            )
-                    {
-                        isRoomAvailable = false;
-                        break;
-                    }
-                    // or if the new reservation schedule end date overlaps an ongoing end date reservation
-                    else if ((new_reservation.getStartDate().isBefore(reservation.getEndDate()) || new_reservation.getStartDate().equals(reservation.getEndDate()))
-                            && (new_reservation.getEndDate().isAfter(reservation.getEndDate()) || new_reservation.getEndDate().equals(reservation.getEndDate()))
-                            )
-                    {
-                        isRoomAvailable = false;
-                        break;
-                    } else if (new_reservation.getStartDate().isAfter(reservation.getStartDate())
-                            && new_reservation.getEndDate().isBefore(reservation.getEndDate())) {
-                        isRoomAvailable = false;
-                        break;
-                    }
+                // if the new reservation schedule start date overlaps an ongoing start date reservation
+                if ((new_reservation.getStartDate().isBefore(reservation.getStartDate()) || new_reservation.getStartDate().equals(reservation.getStartDate()))
+                        && (new_reservation.getEndDate().isAfter(reservation.getStartDate()) || new_reservation.getEndDate().equals(reservation.getStartDate()))
+                        )
+                {
+                    isRoomAvailable = false;
+                    break;
+                }
+                // or if the new reservation schedule end date overlaps an ongoing end date reservation
+                else if ((new_reservation.getStartDate().isBefore(reservation.getEndDate()) || new_reservation.getStartDate().equals(reservation.getEndDate()))
+                        && (new_reservation.getEndDate().isAfter(reservation.getEndDate()) || new_reservation.getEndDate().equals(reservation.getEndDate()))
+                        )
+                {
+                    isRoomAvailable = false;
+                    break;
+                } else if (new_reservation.getStartDate().isAfter(reservation.getStartDate())
+                        && new_reservation.getEndDate().isBefore(reservation.getEndDate())) {
+                    isRoomAvailable = false;
+                    break;
                 }
             }
-            else
-            {
-                isRoomAvailable = false;
-            }
+
+            isCapacitySufficient = new_reservation.getRoom().getCapacity() >= new_reservation.getGuestsCount();
         }
-        else if(DiningRoom.class.isInstance(new_reservation.getRoom()))
+        else if(new_reservation.getRoom().getRoomType() == RoomType.DININGROOM)
         {
             int nbSeatsAlreadyBooked = 0;
 
@@ -164,27 +163,43 @@ public class Hotel {
 
             if(nbSeatsAlreadyBooked + new_reservation.getGuestsCount() > new_reservation.getRoom().getCapacity())
             {
-                isRoomAvailable = false;
+                isRoomAvailable      = false;
+                isCapacitySufficient = false;
             }
         }
 
-        return isRoomAvailable;
+        if(isRoomAvailable && ! isCapacitySufficient)
+        {
+            return ReservationRequestStatus.OVER_CAPACITY;
+        }
+        else if(! isRoomAvailable && isCapacitySufficient)
+        {
+            return ReservationRequestStatus.NOT_AVAILABLE;
+        }
+        else if(! isRoomAvailable && ! isCapacitySufficient)
+        {
+            return ReservationRequestStatus.NOT_AVAILABLE_AND_OVER_CAPACITY;
+        }
+        else
+        {
+            return ReservationRequestStatus.OK;
+        }
     }
 
 
-    public Boolean checkReservationToAdd(Room room, String startDate, int duration,  ArrayList<Guest> guests){
+    public ReservationRequestStatus checkReservationToAdd(Room room, String startDate, int duration,  ArrayList<Guest> guests){
 
         checkOutAllEndedReservation();
 
-        Boolean reservationAdded = false;
-        Reservation reservationToAdd = new Reservation(room, startDate, duration, guests);
+        Reservation reservationToAdd               = new Reservation(room, startDate, duration, guests);
+        ReservationRequestStatus reservationStatus = isRoomAvailable(reservationToAdd);
 
-        if(isRoomAvailable(reservationToAdd) && guests.size() > 0) {
+        if(reservationStatus == ReservationRequestStatus.OK) {
             reservations.add(reservationToAdd);
-            reservationAdded = true;
+            reservationStatus = ReservationRequestStatus.SAVED;
         }
 
-        return reservationAdded;
+        return reservationStatus;
     }
 
     public void checkOutReservation(Reservation reservation){
@@ -208,9 +223,11 @@ public class Hotel {
     }
 
 
-    public ArrayList<Room> searchForRooms()
+    public ArrayList<Room> searchForRooms(RoomType roomType, String startDate, int duration, int guestsNumber)
     {
         ArrayList<Room> foundRooms = new ArrayList<>();
+
+
 
 
 
